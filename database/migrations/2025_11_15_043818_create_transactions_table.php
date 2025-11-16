@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('receiver_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
-            $table->decimal('comission_fee', 10, 2)->default(0);
+            $table->decimal('commission_fee', 10, 2)->default(0);
             $table->timestamps();
 
             $table->index('sender_id');
