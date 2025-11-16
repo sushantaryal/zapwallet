@@ -13,6 +13,8 @@ class Transaction extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'sender_id',
+        'receiver_id',
         'amount',
         'commission_fee',
     ];
