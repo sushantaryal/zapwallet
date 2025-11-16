@@ -41,12 +41,14 @@ class TransactionService
             $sender->save();
             $receiver->save();
 
-            $this->transactions->createTransaction([
+            $transaction = $this->transactions->createTransaction([
                 'sender_id' => $sender->id,
                 'receiver_id' => $receiver->id,
                 'amount' => $amount,
                 'commission_fee' => $commission,
             ]);
+
+            return $transaction;
         });
     }
 
