@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\TransactionRepositoryInterface;
+use App\Events\TransactionCreated;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,8 @@ class TransactionService
                 'amount' => $amount,
                 'commission_fee' => $commission,
             ]);
+
+            TransactionCreated::dispatch($transaction);
 
             return $transaction;
         });
