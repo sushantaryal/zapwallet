@@ -22,7 +22,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'balance' => $userData['balance'],
-            'transactions' => TransactionResource::collection($userData['transactions']),
+            'transactions' => $userData['transactions'],
         ]);
     }
 
@@ -39,7 +39,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'message' => 'Transaction successful',
-            'transaction' => new TransactionResource($transaction),
+            'transaction' => $transaction->load(['sender', 'receiver']),
         ]);
     }
 }
