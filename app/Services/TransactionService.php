@@ -6,12 +6,16 @@ use App\Contracts\TransactionRepositoryInterface;
 use App\Events\TransactionCreated;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\Cache\BalanceCacheService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TransactionService
 {
-    public function __construct(private TransactionRepositoryInterface $transactions) {}
+    public function __construct(
+        protected TransactionRepositoryInterface $transactions,
+        protected BalanceCacheService $balanceCache,
+    ) {}
 
     /**
      * Transfer amount from sender to receiver
@@ -49,6 +53,9 @@ class TransactionService
                 'commission_fee' => $commission,
             ]);
 
+            $this->balanceCache->set($sender, $sender->balance);
+            $this->balanceCache->set($receiver, $receiver->balance);
+
             TransactionCreated::dispatch($transaction);
 
             return $transaction;
@@ -60,9 +67,17 @@ class TransactionService
      */
     public function getUserTransactions(User $user)
     {
+        $balance = $this->balanceCache->get($user);
+
+        if ($balance === null) {
+            $balance = $user->balance;
+            $this->balanceCache->set($user, $balance);
+        }
+
         $transactions = $this->transactions->getTransactions($user);
+        
         return [
-            'balance' => $user->balance,
+            'balance' => $balance,
             'transactions' => $transactions,
         ];
     }
