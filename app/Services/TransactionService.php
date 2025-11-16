@@ -6,6 +6,7 @@ use App\Contracts\TransactionRepositoryInterface;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TransactionService
 {
@@ -16,6 +17,12 @@ class TransactionService
      */
     public function transfer(User $sender, int $receiverId, float $amount)
     {
+        if ($sender->id === $receiverId) {
+            throw ValidationException::withMessages([
+                'amount' => ['The amount cannot be transferred to yourself'],
+            ]);
+        }
+
         return DB::transaction(function () use ($sender, $receiverId, $amount) {
             $receiver = User::lockForUpdate()->findOrFail($receiverId);
             $sender = User::lockForUpdate()->findOrFail($sender->id);
